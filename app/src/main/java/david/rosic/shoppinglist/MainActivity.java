@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -12,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Fragment_Register fragmentRegister;
     private Button btnLogin;
     private Button btnRegister;
+    private ImageView btnHome;
     public static final String DB_NAME = "shared_list_app.db";
 
     @Override
@@ -24,9 +26,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnLogin = findViewById(R.id.main_act_btn_login);
         btnRegister = findViewById(R.id.main_act_btn_register);
+        btnHome = findViewById(R.id.toolbar_home);
 
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
+        btnHome.setOnClickListener(this);
     }
 
     @Override
@@ -42,11 +46,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 btnRegister.setVisibility(View.INVISIBLE);
                 getSupportFragmentManager().beginTransaction().add(R.id.main_act_main_frame, fragmentRegister).commit();
                 break;
+            case R.id.toolbar_home:
+                setHome();
+                break;
         }
     }
 
     @Override
     public void onBackPressed() {
+        setHome();
+    }
+
+    /**
+     * This function reverts the layout to default
+     */
+    private void setHome(){
         if (fragmentLogin.isAdded()) {
             getSupportFragmentManager().beginTransaction().remove(fragmentLogin).commit();
         }
