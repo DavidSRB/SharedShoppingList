@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Shopping List</string>
+    <string name="login">LOGIN</string>
+    <string name="register">REGISTER</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="username_textView">Username:</string>
+    <string name="email_textView">Email:</string>
+    <string name="password_textView">Password:</string>
+    <string name="welcome">WELCOME</string>
+    <string name="new_list">new list</string>
+    <string name="see_my_lists">see my lists</string>
+    <string name="see_shared_lists">see shared lists</string>
+    <string name="newListAlertDialogTitle">New List Dialog</string>
+    <string name="newListAlertDialogMessage">Are you sure you want to create new list?</string>
+    <string name="yesText">Yes</string>
+    <string name="naslov_liste">Naslov liste</string>
+    <string name="naslov">NASLOV</string>
+    <string name="share_list">Share list:</string>
+    <string name="noText">No</string>
+    <string name="save">Save</string>
+    <string name="default_username">userx</string>
+    <string name="naslov1">naslov1</string>
+    <string name="shared">SHARED</string>
+    <string name="false_boolean">false</string>
+    <string name="true_boolean">true</string>
+    <string name="fill_all_fields">Please fill in all fields</string>
+    <string name="enter_valie_email">Please enter a valid email address</string>
+    <string name="pass_length">Password must be at least 6 characters long</string>
+    <string name="shared_shopping_list">Shared Shopping List</string>
+    <string name="add">ADD</string>
+    <string name="registration_error">User already exists</string>
+    <string name="login_error">User does not exist</string>
+    <string name="login_error_password">Wrong password</string>
+    <string name="list_exists_error">List already exists</string>
+</resources>
