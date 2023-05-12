@@ -34,6 +34,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        setHome();
+    }
+
+    @Override
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.main_act_btn_login:

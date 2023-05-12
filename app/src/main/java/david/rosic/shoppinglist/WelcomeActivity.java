@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private static boolean showSharedLists = true;
     private String username = "";
     private Button seeLists;
+    private ImageView btnHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
+        btnHome = findViewById(R.id.toolbar_home);
         Button newListBtn = findViewById(R.id.welcome_act_new_list_button);
         seeLists = findViewById(R.id.welcome_act_see_lists_button);
         seeLists.setText(R.string.see_my_lists);
@@ -53,6 +56,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         newListBtn.setOnClickListener(this);
         seeLists.setOnClickListener(this);
+        btnHome.setOnClickListener(this);
         lista.setOnItemClickListener(this);
         lista.setOnItemLongClickListener(this);
 
@@ -85,6 +89,11 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     adapter.update(shoppingLists);
                     seeLists.setText(R.string.see_shared_lists);
                 }
+                break;
+            case R.id.toolbar_home:
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 break;
         }
     }
