@@ -7,16 +7,18 @@
     tools:context=".ShowListActivity"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/shared_shopping_list"
         android:gravity="center"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:background="@color/papaya_whip"
-        android:paddingTop="5sp"
-        android:paddingBottom="5sp"/>
+        android:paddingTop="3sp"
+        android:paddingBottom="3sp"/>
 
     <TextView
         android:layout_width="match_parent"
