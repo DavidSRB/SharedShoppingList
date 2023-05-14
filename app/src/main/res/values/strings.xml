@@ -32,7 +32,6 @@
     <string name="shared_shopping_list">Shared Shopping List</string>
     <string name="add">ADD</string>
     <string name="registration_error">User already exists</string>
-    <string name="login_error">User does not exist</string>
-    <string name="login_error_password">Wrong password</string>
+    <string name="login_error">Invalid username or password</string>
     <string name="list_exists_error">List already exists</string>
 </resources>

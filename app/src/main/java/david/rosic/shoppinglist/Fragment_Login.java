@@ -12,6 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link Fragment_Login#newInstance} factory method to
@@ -23,6 +28,8 @@ public class Fragment_Login extends Fragment{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private static String LOGIN_URL = MainActivity.BASE_URL + "/login";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -62,7 +69,7 @@ public class Fragment_Login extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment__login, container, false);
-        DbHelper dbHelper = new DbHelper(getActivity(), MainActivity.DB_NAME, null, 1);
+        HttpHelper httpHelper = new HttpHelper();
 
         EditText etUsername = v.findViewById(R.id.frag_login_et_username);
         EditText etPass = v.findViewById(R.id.frag_login_et_pass);
@@ -79,20 +86,34 @@ public class Fragment_Login extends Fragment{
                     return;
                 }
 
-                int loginInfo = dbHelper.loginUser(username, password);
-
-                if(loginInfo == 1) {
-                    Toast.makeText(getActivity(), R.string.login_error, Toast.LENGTH_SHORT).show();
-                    return;
-                }else if(loginInfo == 2) {
-                    Toast.makeText(getActivity(), R.string.login_error_password, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Intent intent = new Intent(getActivity(),WelcomeActivity.class);
-                intent.putExtra("username", username);
-                intent.putExtra("password", password);
-                startActivity(intent);
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            JSONObject requestJSON = new JSONObject();
+                            requestJSON.put("username", username);
+                            requestJSON.put("password", password);
+                            boolean jsonObject = httpHelper.postJSONObjectFromURL(LOGIN_URL,requestJSON);
+                            if(jsonObject) {
+                                Intent intent = new Intent(getActivity(),WelcomeActivity.class);
+                                intent.putExtra("username",username);
+                                intent.putExtra("password",password);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        startActivity(intent);
+                                    }
+                                });
+                            }else{
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(getActivity(), R.string.login_error, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
         });
 
