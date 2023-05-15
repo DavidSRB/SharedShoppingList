@@ -146,11 +146,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
         boolean returnSuccess = false;
 
-        if(shoppingList.ismShared()){
-            if (dbHelper.deleteList(shoppingList.getmNaslov(), username)) {
-                adapter.removeShoppingList(shoppingList);
-                returnSuccess = true;
-            }
+        if (dbHelper.deleteList(shoppingList.getmNaslov(), username)) {
+            adapter.removeShoppingList(shoppingList);
+            returnSuccess = true;
         }
 
         if(shoppingList.ismShared()){
@@ -159,7 +157,12 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                     try {
                         boolean test = httpHelper.httpDelete(LIST_URL + "/" + username + "/" + shoppingList.getmNaslov());
                         if(test){
-                            adapter.removeShoppingList(shoppingList);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.removeShoppingList(shoppingList);
+                                }
+                            });
                         }
                     } catch (IOException | JSONException e) {
                         e.printStackTrace();
