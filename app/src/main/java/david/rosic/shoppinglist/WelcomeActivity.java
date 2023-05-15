@@ -135,6 +135,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 boolean shared = data.getBooleanExtra("shared", false);
 
                 if(shared){
+                    if(dbHelper.createList(title, username, shared) && !showSharedLists){
+                        adapter.addShoppingList(new ShoppingList(title,shared));
+                    }
                     //shared lists are added to Server DB
                     new Thread(new Runnable() {
                         public void run() {
