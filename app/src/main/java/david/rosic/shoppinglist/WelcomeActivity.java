@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private HttpHelper httpHelper;
     private ShoppingListAdapter adapter;
     private DbHelper dbHelper;
-    private static boolean showSharedLists = true;
+    private static boolean showSharedLists = false;
     private String username = "";
     private Button seeLists;
     private ImageView btnHome;
@@ -40,10 +41,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         Bundle extras = getIntent().getExtras();
 
-        if(extras != null){
+        if (extras != null) {
             username = extras.getString("username");
             TextView userTv = findViewById(R.id.welcome_act_user_tv);
-            if(!username.isEmpty()){
+            if (!username.isEmpty()) {
                 userTv.setText(username);
             }
         }
@@ -57,10 +58,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         httpHelper = new HttpHelper();
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
 
-        showSharedLists = true;
-        seeLists.setText(R.string.see_my_lists);
+        showSharedLists = false;
+        seeLists.setText(R.string.see_shared_lists);
         lista.setAdapter(adapter);
-        ShoppingList[] shoppingLists = dbHelper.getAllAccessibleLists(username);
+        ShoppingList[] shoppingLists = dbHelper.getAllUserLists(username);
         adapter.update(shoppingLists);
 
         newListBtn.setOnClickListener(this);
@@ -73,7 +74,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.welcome_act_new_list_button:
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle(R.string.newListAlertDialogTitle);
@@ -81,19 +82,44 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 builder.setPositiveButton(R.string.yesText, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(WelcomeActivity.this,NewListActivity.class);
-                        startActivityForResult(intent,REQUEST_CODE_NEW_LIST);
+                        Intent intent = new Intent(WelcomeActivity.this, NewListActivity.class);
+                        startActivityForResult(intent, REQUEST_CODE_NEW_LIST);
                     }
                 });
                 builder.show();
                 break;
             case R.id.welcome_act_see_lists_button:
                 showSharedLists = !showSharedLists;
-                if(showSharedLists){
-                    ShoppingList[] shoppingLists = dbHelper.getAllAccessibleLists(username);
-                    adapter.update(shoppingLists);
+                if (showSharedLists) {//TODO: ovde valjda treba da se ucitaju sa servera
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONArray jsonArray = httpHelper.getJSONArrayFromURL(LIST_URL);
+
+                                ShoppingList[] shoppingLists = new ShoppingList[jsonArray.length()];
+
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject item = jsonArray.getJSONObject(i);
+                                    String title = item.getString("name");
+                                    String username = item.getString("creator");
+                                    boolean shared = item.getBoolean("shared");
+
+                                    shoppingLists[i] = new ShoppingList(title, shared);
+                                }
+
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        adapter.update(shoppingLists);
+                                    }
+                                });
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
                     seeLists.setText(R.string.see_my_lists);
-                }else{
+                } else {
                     ShoppingList[] shoppingLists = dbHelper.getAllUserLists(username);
                     adapter.update(shoppingLists);
                     seeLists.setText(R.string.see_shared_lists);
@@ -109,7 +135,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this,ShowListActivity.class);
+        Intent intent = new Intent(this, ShowListActivity.class);
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
         intent.putExtra("title", shoppingList.getmNaslov());
         startActivity(intent);
@@ -119,7 +145,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
 
-        if (dbHelper.deleteList(shoppingList.getmNaslov(), username)){
+        if (dbHelper.deleteList(shoppingList.getmNaslov(), username)) {
             adapter.removeShoppingList(shoppingList);
             return true;
         }
@@ -134,9 +160,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 String title = data.getStringExtra("title");
                 boolean shared = data.getBooleanExtra("shared", false);
 
-                if(shared){
-                    if(dbHelper.createList(title, username, shared) && !showSharedLists){
-                        adapter.addShoppingList(new ShoppingList(title,shared));
+                if (shared) {
+                    if (dbHelper.createList(title, username, shared) && !showSharedLists) {
+                        adapter.addShoppingList(new ShoppingList(title, shared));
                     }
                     //shared lists are added to Server DB
                     new Thread(new Runnable() {
@@ -146,17 +172,17 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                                 requestJSON.put("name", title);
                                 requestJSON.put("creator", username);
                                 requestJSON.put("shared", shared);
-                                boolean resultHTTP = httpHelper.postJSONObjectFromURL(LIST_URL,requestJSON);
-                                if(resultHTTP) {
+                                boolean resultHTTP = httpHelper.postJSONObjectFromURL(LIST_URL, requestJSON);
+                                if (resultHTTP) {
                                     runOnUiThread(new Runnable() {
                                         public void run() {
-                                            Toast.makeText(getApplicationContext() , R.string.successful_list_creation, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), R.string.successful_list_creation, Toast.LENGTH_SHORT).show();
                                         }
                                     });
-                                }else{
+                                } else {
                                     runOnUiThread(new Runnable() {
                                         public void run() {
-                                            Toast.makeText(getApplicationContext() , R.string.list_create_failed, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), R.string.list_create_failed, Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -165,10 +191,10 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                             }
                         }
                     }).start();
-                }else{
+                } else {
                     //private lists are added to local DB
-                    if(dbHelper.createList(title, username, shared) && !showSharedLists){
-                        adapter.addShoppingList(new ShoppingList(title,shared));
+                    if (dbHelper.createList(title, username, shared) && !showSharedLists) {
+                        adapter.addShoppingList(new ShoppingList(title, shared));
                     }
                 }
 
