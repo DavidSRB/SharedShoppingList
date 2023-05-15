@@ -13,11 +13,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final int REQUEST_CODE_NEW_LIST = 1;
+    private static String LIST_URL = MainActivity.BASE_URL + "/lists";
 
+    private HttpHelper httpHelper;
     private ShoppingListAdapter adapter;
     private DbHelper dbHelper;
     private static boolean showSharedLists = true;
@@ -43,14 +51,15 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         btnHome = findViewById(R.id.toolbar_home);
         Button newListBtn = findViewById(R.id.welcome_act_new_list_button);
         seeLists = findViewById(R.id.welcome_act_see_lists_button);
-        seeLists.setText(R.string.see_my_lists);
-        showSharedLists = true;
         ListView lista = findViewById(R.id.welcome_act_list);
 
         adapter = new ShoppingListAdapter(this);
-        lista.setAdapter(adapter);
-
+        httpHelper = new HttpHelper();
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
+
+        showSharedLists = true;
+        seeLists.setText(R.string.see_my_lists);
+        lista.setAdapter(adapter);
         ShoppingList[] shoppingLists = dbHelper.getAllAccessibleLists(username);
         adapter.update(shoppingLists);
 
@@ -125,9 +134,41 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 String title = data.getStringExtra("title");
                 boolean shared = data.getBooleanExtra("shared", false);
 
-                if(dbHelper.createList(title, username, shared)){
-                    adapter.addShoppingList(new ShoppingList(title,shared));
+                if(shared){
+                    //shared lists are added to Server DB
+                    new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                JSONObject requestJSON = new JSONObject();
+                                requestJSON.put("name", title);
+                                requestJSON.put("creator", username);
+                                requestJSON.put("shared", shared);
+                                boolean resultHTTP = httpHelper.postJSONObjectFromURL(LIST_URL,requestJSON);
+                                if(resultHTTP) {
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            Toast.makeText(getApplicationContext() , R.string.successful_list_creation, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }else{
+                                    runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            Toast.makeText(getApplicationContext() , R.string.list_create_failed, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }else{
+                    //private lists are added to local DB
+                    if(dbHelper.createList(title, username, shared) && !showSharedLists){
+                        adapter.addShoppingList(new ShoppingList(title,shared));
+                    }
                 }
+
             }
         }
     }
