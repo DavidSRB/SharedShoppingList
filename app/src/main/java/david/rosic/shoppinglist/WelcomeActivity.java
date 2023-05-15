@@ -175,6 +175,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         return returnSuccess;
     }
 
+    //TODO: Deprecated, list creation should be transplanted to NewListActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -195,20 +196,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                                 requestJSON.put("name", title);
                                 requestJSON.put("creator", username);
                                 requestJSON.put("shared", shared);
-                                boolean resultHTTP = httpHelper.postJSONObjectFromURL(LIST_URL, requestJSON);
-                                if (resultHTTP) {
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(getApplicationContext(), R.string.successful_list_creation, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(getApplicationContext(), R.string.list_create_failed, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
+                                httpHelper.postJSONObjectFromURL(LIST_URL, requestJSON);
                             } catch (IOException | JSONException e) {
                                 e.printStackTrace();
                             }
