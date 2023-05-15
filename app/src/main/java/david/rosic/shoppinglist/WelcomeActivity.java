@@ -90,7 +90,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.welcome_act_see_lists_button:
                 showSharedLists = !showSharedLists;
-                if (showSharedLists) {//TODO: ovde valjda treba da se ucitaju sa servera
+                if (showSharedLists) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -144,12 +144,32 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
+        boolean returnSuccess = false;
 
-        if (dbHelper.deleteList(shoppingList.getmNaslov(), username)) {
-            adapter.removeShoppingList(shoppingList);
-            return true;
+        if(shoppingList.ismShared()){
+            if (dbHelper.deleteList(shoppingList.getmNaslov(), username)) {
+                adapter.removeShoppingList(shoppingList);
+                returnSuccess = true;
+            }
         }
-        return false;
+
+        if(shoppingList.ismShared()){
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        boolean test = httpHelper.httpDelete(LIST_URL + "/" + username + "/" + shoppingList.getmNaslov());
+                        if(test){
+                            adapter.removeShoppingList(shoppingList);
+                        }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            returnSuccess = true;
+        }
+
+        return returnSuccess;
     }
 
     @Override
