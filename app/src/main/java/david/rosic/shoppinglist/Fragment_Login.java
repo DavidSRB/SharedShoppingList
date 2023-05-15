@@ -92,8 +92,8 @@ public class Fragment_Login extends Fragment{
                             JSONObject requestJSON = new JSONObject();
                             requestJSON.put("username", username);
                             requestJSON.put("password", password);
-                            boolean jsonObject = httpHelper.postJSONObjectFromURL(LOGIN_URL,requestJSON);
-                            if(jsonObject) {
+                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(LOGIN_URL,requestJSON);
+                            if(resultHTTP) {
                                 Intent intent = new Intent(getActivity(),WelcomeActivity.class);
                                 intent.putExtra("username",username);
                                 intent.putExtra("password",password);

@@ -112,8 +112,8 @@ public class Fragment_Register extends Fragment {
                             requestJSON.put("username", username);
                             requestJSON.put("password", password);
                             requestJSON.put("email", email);
-                            boolean jsonObject = httpHelper.postJSONObjectFromURL(REGISTER_URL,requestJSON);
-                            if(jsonObject) {
+                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(REGISTER_URL,requestJSON);
+                            if(resultHTTP) {
                                 Intent intent = new Intent(getActivity(),WelcomeActivity.class);
                                 intent.putExtra("username",username);
                                 intent.putExtra("email",email);
