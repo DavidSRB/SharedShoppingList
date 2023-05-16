@@ -71,6 +71,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        //TODO: update the task deletion for the shared lists
         Task task = (Task) adapter.getItem(position);
         if(dbHelper.deleteItem(task.getmId())){
             adapter.removeTask(task);

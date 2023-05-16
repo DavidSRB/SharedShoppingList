@@ -137,6 +137,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this, ShowListActivity.class);
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
+        boolean userOwned = dbHelper.doesListExist(shoppingList.getmNaslov());
+        intent.putExtra("userOwned",userOwned);
+        intent.putExtra("shared", shoppingList.ismShared());
         intent.putExtra("title", shoppingList.getmNaslov());
         startActivity(intent);
     }
