@@ -83,12 +83,43 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         //TODO: update the task deletion for the shared lists
         Task task = (Task) adapter.getItem(position);
-        if(dbHelper.deleteItem(task.getmId())){
-            adapter.removeTask(task);
-            adapter.removeCheck(position);
-            return true;
+        long taskId = task.getmId();
+
+        if(shared) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONArray jsonArray = httpHelper.getJSONArrayFromURL(TASK_URL + "/" + title);
+
+                        String tasksMongoId = "";
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            String name = jsonObject.getString("name");
+                            boolean done = jsonObject.getBoolean("done");
+                            long id = jsonObject.getLong("taskId");
+                            tasksMongoId = jsonObject.getString("_id");
+
+                            if(taskId == id){
+                                break;
+                            }
+                        }
+                        boolean returnCode = httpHelper.httpDelete(TASK_URL + "/" + tasksMongoId);
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
-        return false;
+
+        //Possible check errors. The httpDelete returnCode & dbHelper.deleteItem result are never checked
+        //TODO: check for errors
+        dbHelper.deleteItem(task.getmId());
+        adapter.removeTask(task);
+        adapter.removeCheck(position);
+
+        return true;
     }
 
     @Override
