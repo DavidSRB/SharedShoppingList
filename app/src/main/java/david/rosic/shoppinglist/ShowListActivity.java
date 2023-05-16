@@ -136,8 +136,10 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 }
 
                 boolean successIndicator = dbHelper.createItem(itemName, title, randomLongId);
-                Task task = new Task(et.getText().toString(),false, randomLongId);
-                adapter.addTask(task);
+                if(!shared){
+                    Task task = new Task(et.getText().toString(),false, randomLongId);
+                    adapter.addTask(task);
+                }
                 break;
             case R.id.toolbar_home:
                 Intent intent = new Intent(this, MainActivity.class);
