@@ -13,6 +13,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Random;
+
 public class ShowListActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, View.OnClickListener {
 
     private TaskAdapter adapter;
@@ -22,6 +29,8 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     private ImageView btnHome;
     private boolean shared;
     private boolean userOwned;
+    private static String TASK_URL = MainActivity.BASE_URL + "/tasks";
+    private HttpHelper httpHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +56,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
         adapter = new TaskAdapter(this, dbHelper);
+        httpHelper = new HttpHelper();
 
         if(shared && userOwned){
             refreshBtn.setVisibility(View.INVISIBLE);
@@ -92,9 +102,41 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                     Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                long id = dbHelper.createItem(itemName, title);
-                Task task = new Task(et.getText().toString(),false, id);
-                et.setText("");
+                Random random = new Random();
+                long randomLongId = random.nextLong();
+
+                if(shared) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("name", itemName);
+                                jsonObject.put("list", title);
+                                jsonObject.put("done", false);
+                                jsonObject.put("taskId", randomLongId);
+
+                                boolean returnCode = httpHelper.postJSONObjectFromURL(TASK_URL, jsonObject);
+
+                                if(!returnCode){
+                                    return;
+                                }
+
+                                Task task = new Task(itemName, false, randomLongId);
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        adapter.addTask(task);
+                                    }
+                                });
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+
+                boolean successIndicator = dbHelper.createItem(itemName, title, randomLongId);
+                Task task = new Task(et.getText().toString(),false, randomLongId);
                 adapter.addTask(task);
                 break;
             case R.id.toolbar_home:
@@ -104,6 +146,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 break;
             case R.id.show_list_act_refresh_btn:
                 //TODO: fetch tasks, send the GET request to the HTTP server
+
                 break;
         }
     }

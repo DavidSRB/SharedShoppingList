@@ -50,7 +50,7 @@ public class DbHelper extends SQLiteOpenHelper {
         //Creates table of items
         db.execSQL("CREATE TABLE " + TABLE_ITEMS +
                 " (" +
-                COLUMN_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_ITEM_ID + " INTEGER PRIMARY KEY, " +
                 COLUMN_ITEM_NAME + " TEXT, " +
                 COLUMN_LIST_NAME + " TEXT, " +
                 COLUMN_TICKED + " INTEGER" +
@@ -70,9 +70,9 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param username
      * @return true if the username exists.
      */
-    private boolean doesUserExist(String username){
+    private boolean doesUserExist(String username) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_USERS, null, COLUMN_USERNAME + " =?", new String[] {username}, null, null, null);
+        Cursor cursor = db.query(TABLE_USERS, null, COLUMN_USERNAME + " =?", new String[]{username}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             close();
@@ -91,9 +91,9 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param password
      * @return false if the user already exists, true if not.
      */
-    public boolean registerUser(String username, String email, String password){
+    public boolean registerUser(String username, String email, String password) {
 
-        if(doesUserExist(username)){
+        if (doesUserExist(username)) {
             return false;
         }
 
@@ -116,13 +116,13 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param password
      * @return 0 on successful login, 1 on non-existant user, 2 on wrong password.
      */
-    public int loginUser(String username, String password){
-        if(!doesUserExist(username)){
+    public int loginUser(String username, String password) {
+        if (!doesUserExist(username)) {
             return 1;
         }
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_USERS, null, COLUMN_USERNAME + " =?", new String[] {username}, null, null, null);
+        Cursor cursor = db.query(TABLE_USERS, null, COLUMN_USERNAME + " =?", new String[]{username}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             close();
@@ -133,7 +133,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         String dbPassword = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PASSWORD));
 
-        if (password.equals(dbPassword)){
+        if (password.equals(dbPassword)) {
             close();
             return 0;
         }
@@ -151,9 +151,9 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param listName
      * @return true if the list exists.
      */
-    public boolean doesListExist(String listName){
+    public boolean doesListExist(String listName) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_LISTS, null, COLUMN_LIST_NAME + " =?", new String[] {listName}, null, null, null);
+        Cursor cursor = db.query(TABLE_LISTS, null, COLUMN_LIST_NAME + " =?", new String[]{listName}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             close();
@@ -171,11 +171,11 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param listName
      * @return 0 if user is owner, 1 if user is not the owner, 2 if the list doesn't exist.
      */
-    private int isListOwnedByUser(String username, String listName){
+    private int isListOwnedByUser(String username, String listName) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_LISTS, null, COLUMN_LIST_NAME + " = ?", new String[] {listName}, null, null, null);
+        Cursor cursor = db.query(TABLE_LISTS, null, COLUMN_LIST_NAME + " = ?", new String[]{listName}, null, null, null);
 
-        if (cursor.getCount() <= 0){
+        if (cursor.getCount() <= 0) {
             close();
             return 2;
         }
@@ -183,7 +183,7 @@ public class DbHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         String dbUsername = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USERNAME));
 
-        if(username.equals(dbUsername)){
+        if (username.equals(dbUsername)) {
             close();
             return 0;
         }
@@ -197,7 +197,7 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param cursor
      * @return a new ShoppingList object with values retrieved from the Cursor.
      */
-    private ShoppingList createListInstance(Cursor cursor){
+    private ShoppingList createListInstance(Cursor cursor) {
         String listName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LIST_NAME));
         int shared = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SHARED));
 
@@ -212,8 +212,8 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param shared
      * @return true if the list is created, false if the list already exists in the database.
      */
-    public boolean createList(String listName, String username, Boolean shared){
-        if(doesListExist(listName)){
+    public boolean createList(String listName, String username, Boolean shared) {
+        if (doesListExist(listName)) {
             return false;
         }
 
@@ -236,16 +236,16 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param username
      * @return true if the list was successfully deleted, false if the user does not own the list or the list does not exist in the database.
      */
-    public boolean deleteList(String listName, String username){
+    public boolean deleteList(String listName, String username) {
         int listInfo = isListOwnedByUser(username, listName);
 
-        if(listInfo == 1 || listInfo == 2){
+        if (listInfo == 1 || listInfo == 2) {
             return false;
         }
 
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_LISTS, COLUMN_LIST_NAME + " = ?", new String[] {listName});
-        db.delete(TABLE_ITEMS, COLUMN_LIST_NAME + " = ?", new String[] {listName});
+        db.delete(TABLE_LISTS, COLUMN_LIST_NAME + " = ?", new String[]{listName});
+        db.delete(TABLE_ITEMS, COLUMN_LIST_NAME + " = ?", new String[]{listName});
         close();
         return true;
     }
@@ -257,10 +257,10 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param username
      * @return a list of all the shopping lists accessible to the user.
      */
-    public ShoppingList[] getAllAccessibleLists(String username){
+    public ShoppingList[] getAllAccessibleLists(String username) {
         SQLiteDatabase db = getReadableDatabase();
         String selection = COLUMN_USERNAME + " = ? OR " + COLUMN_SHARED + " = 1";
-        Cursor cursor = db.query(TABLE_LISTS, null, selection, new String[] {username}, null, null, null);
+        Cursor cursor = db.query(TABLE_LISTS, null, selection, new String[]{username}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             close();
@@ -269,7 +269,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         ShoppingList[] list = new ShoppingList[cursor.getCount()];
         int i = 0;
-        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()){
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             list[i++] = createListInstance(cursor);
         }
 
@@ -283,10 +283,10 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param username
      * @return a list of all the shoppping lists that belong to the user.
      */
-    public ShoppingList[] getAllUserLists(String username){
+    public ShoppingList[] getAllUserLists(String username) {
         SQLiteDatabase db = getReadableDatabase();
         String selection = COLUMN_USERNAME + " = ?";
-        Cursor cursor = db.query(TABLE_LISTS, null, selection, new String[] {username}, null, null, null);
+        Cursor cursor = db.query(TABLE_LISTS, null, selection, new String[]{username}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             close();
@@ -295,7 +295,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         ShoppingList[] list = new ShoppingList[cursor.getCount()];
         int i = 0;
-        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()){
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             list[i++] = createListInstance(cursor);
         }
 
@@ -311,7 +311,7 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param cursor
      * @return Task object instance
      */
-    private Task createItemInstance(Cursor cursor){
+    private Task createItemInstance(Cursor cursor) {
         String itemName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ITEM_NAME));
         int ticked = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TICKED));
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ITEM_ID));
@@ -326,18 +326,23 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param listName
      * @return long id generated from the database
      */
-    public long createItem(String itemName, String listName){
+    public boolean createItem(String itemName, String listName, long id) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_ITEM_NAME, itemName);
         values.put(COLUMN_LIST_NAME, listName);
+        values.put(COLUMN_ITEM_ID, id);
         values.put(COLUMN_TICKED, 0);
 
-        long id = db.insert(TABLE_ITEMS, null, values);
+        long row = db.insert(TABLE_ITEMS, null, values);
         close();
 
-        return id;
+        if (row == -1) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -346,14 +351,14 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param id database id of the item that should be deleted
      * @return true if the item was successfully deleted, false if the item with specified id does not exist in the database.
      */
-    public boolean deleteItem(long id){
+    public boolean deleteItem(long id) {
         SQLiteDatabase db = getWritableDatabase();
-        int numRowsAffected = db.delete(TABLE_ITEMS, COLUMN_ITEM_ID + " = ?", new String[] {Long.toString(id)});
+        int numRowsAffected = db.delete(TABLE_ITEMS, COLUMN_ITEM_ID + " = ?", new String[]{Long.toString(id)});
 
-        if (numRowsAffected == 1){
+        if (numRowsAffected == 1) {
             close();
             return true;
-        }else{
+        } else {
             close();
             return false;
         }
@@ -362,22 +367,22 @@ public class DbHelper extends SQLiteOpenHelper {
     /**
      * This function updates the ticked state of an item
      *
-     * @param id of item that will be updated
+     * @param id     of item that will be updated
      * @param ticked new state
      * @return true if the update was successful, false if not
      */
-    public boolean setItemState(long id, boolean ticked){
+    public boolean setItemState(long id, boolean ticked) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_TICKED, (ticked ? 1 : 0));
 
-        int numRowsAffected = db.update(TABLE_ITEMS, values, COLUMN_ITEM_ID + " = ?", new String[] {String.valueOf(id)});
+        int numRowsAffected = db.update(TABLE_ITEMS, values, COLUMN_ITEM_ID + " = ?", new String[]{String.valueOf(id)});
 
-        if(numRowsAffected == 1){
+        if (numRowsAffected == 1) {
             close();
             return true;
-        }else{
+        } else {
             close();
             return false;
         }
@@ -389,9 +394,9 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param listName list from which items will be returned
      * @return returns a list of Task objects, items in specified list
      */
-    public Task[] getListItems(String listName){
+    public Task[] getListItems(String listName) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ITEMS, null, COLUMN_LIST_NAME + " = ?", new String[] {listName}, null, null, null);
+        Cursor cursor = db.query(TABLE_ITEMS, null, COLUMN_LIST_NAME + " = ?", new String[]{listName}, null, null, null);
 
         if (cursor.getCount() <= 0) {
             return null;
