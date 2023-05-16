@@ -31,6 +31,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     private boolean userOwned;
     private static String TASK_URL = MainActivity.BASE_URL + "/tasks";
     private HttpHelper httpHelper;
+    private Button refreshBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
         lista = findViewById(R.id.show_list_act_list);
         btnHome = findViewById(R.id.toolbar_home);
         Button addBtn = findViewById(R.id.show_list_act_add_btn);
-        Button refreshBtn = findViewById(R.id.show_list_act_refresh_btn);
+        refreshBtn = findViewById(R.id.show_list_act_refresh_btn);
 
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
         adapter = new TaskAdapter(this, dbHelper);
@@ -60,8 +61,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         if(shared && userOwned){
             refreshBtn.setVisibility(View.INVISIBLE);
-            Task[] tasks = dbHelper.getListItems(title);
-            adapter.update(tasks);
+            fetchTasks();
         } else if (shared) {
             refreshBtn.setVisibility(View.VISIBLE);
         } else {
@@ -95,7 +95,6 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.show_list_act_add_btn:
-                //TODO: change the task creation
                 EditText et = findViewById(R.id.show_list_act_et);
                 String itemName = et.getText().toString();
                 if(itemName.isEmpty()){
@@ -147,9 +146,41 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 startActivity(intent);
                 break;
             case R.id.show_list_act_refresh_btn:
-                //TODO: fetch tasks, send the GET request to the HTTP server
+                refreshBtn.setVisibility(View.INVISIBLE);
+                fetchTasks();
 
                 break;
         }
+    }
+
+    private void fetchTasks(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONArray jsonArray = httpHelper.getJSONArrayFromURL(TASK_URL + "/" + title);
+
+                    Task[] tasks = new Task[jsonArray.length()];
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        String name = jsonObject.getString("name");
+                        boolean done = jsonObject.getBoolean("done");
+                        long id = jsonObject.getLong("taskId");
+
+                        tasks[i] = new Task(name, done, id);
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.update(tasks);
+                        }
+                    });
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

@@ -171,7 +171,7 @@ public class DbHelper extends SQLiteOpenHelper {
      * @param listName
      * @return 0 if user is owner, 1 if user is not the owner, 2 if the list doesn't exist.
      */
-    private int isListOwnedByUser(String username, String listName) {
+    public int isListOwnedByUser(String username, String listName) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_LISTS, null, COLUMN_LIST_NAME + " = ?", new String[]{listName}, null, null, null);
 
