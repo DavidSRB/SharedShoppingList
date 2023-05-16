@@ -36,4 +36,5 @@
     <string name="list_exists_error">List already exists</string>
     <string name="successful_list_creation">List created successfully</string>
     <string name="list_create_failed">List creation failed</string>
+    <string name="refresh">Refresh</string>
 </resources>

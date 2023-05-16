@@ -20,6 +20,8 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     private DbHelper dbHelper;
     private String title = "";
     private ImageView btnHome;
+    private boolean shared;
+    private boolean userOwned;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,8 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         if(extras != null){
             title = extras.getString("title");
+            shared = extras.getBoolean("shared");
+            userOwned = extras.getBoolean("userOwned");
             TextView tv = findViewById(R.id.show_list_act_title_tv);
             if(!title.isEmpty()){
                 tv.setText(title);
@@ -38,18 +42,30 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         lista = findViewById(R.id.show_list_act_list);
         btnHome = findViewById(R.id.toolbar_home);
-        Button btn = findViewById(R.id.show_list_act_btn);
+        Button addBtn = findViewById(R.id.show_list_act_add_btn);
+        Button refreshBtn = findViewById(R.id.show_list_act_refresh_btn);
 
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
         adapter = new TaskAdapter(this, dbHelper);
 
-        Task[] tasks = dbHelper.getListItems(title);
-        adapter.update(tasks);
+        if(shared && userOwned){
+            refreshBtn.setVisibility(View.INVISIBLE);
+            Task[] tasks = dbHelper.getListItems(title);
+            adapter.update(tasks);
+        } else if (shared) {
+            refreshBtn.setVisibility(View.VISIBLE);
+        } else {
+            refreshBtn.setVisibility(View.INVISIBLE);
+            Task[] tasks = dbHelper.getListItems(title);
+            adapter.update(tasks);
+        }
+
         lista.setAdapter(adapter);
 
         lista.setOnItemLongClickListener(this);
-        btn.setOnClickListener(this);
+        addBtn.setOnClickListener(this);
         btnHome.setOnClickListener(this);
+        refreshBtn.setOnClickListener(this);
 
     }
 
@@ -67,7 +83,8 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.show_list_act_btn:
+            case R.id.show_list_act_add_btn:
+                //TODO: change the task creation
                 EditText et = findViewById(R.id.show_list_act_et);
                 String itemName = et.getText().toString();
                 if(itemName.isEmpty()){
@@ -83,6 +100,9 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
+                break;
+            case R.id.show_list_act_refresh_btn:
+                //TODO: fetch tasks, send the GET request to the HTTP server
                 break;
         }
     }

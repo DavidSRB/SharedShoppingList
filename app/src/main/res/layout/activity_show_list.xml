@@ -44,9 +44,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="@string/add"
-            android:id="@+id/show_list_act_btn"/>
+            android:id="@+id/show_list_act_add_btn"/>
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/refresh"
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/baseline_refresh_24"
+        android:id="@+id/show_list_act_refresh_btn"/>
 
     <ListView
         android:layout_width="match_parent"
