@@ -37,4 +37,6 @@
     <string name="successful_list_creation">List created successfully</string>
     <string name="list_create_failed">List creation failed</string>
     <string name="refresh">Refresh</string>
+    <string name="empty_title_error">Fill in the title field</string>
+    <string name="list_no_title_error">List has to have title</string>
 </resources>

@@ -99,7 +99,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             String name = jsonObject.getString("name");
                             boolean done = jsonObject.getBoolean("done");
-                            long mojId = Long.parseLong(jsonObject.getString("taskId"),16);
+                            long mojId = Long.parseLong(jsonObject.getString("taskId"),36);
                             tasksMongoId = jsonObject.getString("_id");
 
                             if (taskId == mojId) {
@@ -133,10 +133,10 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                     return;
                 }
                 Random random = new Random();
-                long randomLongId = Math.abs(random.nextInt());
+                long randomLongId = Math.abs(random.nextLong());
 
                 if (shared) {
-                    CreteItemRunnable runnable = new CreteItemRunnable(itemName, title, Long.toHexString(randomLongId), httpHelper, adapter);
+                    CreteItemRunnable runnable = new CreteItemRunnable(itemName, title, Long.toString(randomLongId,36), httpHelper, adapter);
                     Thread thread = new Thread(runnable);
                     thread.start();
                 }
@@ -146,6 +146,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                     Task task = new Task(et.getText().toString(), false, randomLongId);
                     adapter.addTask(task);
                 }
+                et.setText("");
                 break;
             case R.id.toolbar_home:
                 Intent intent = new Intent(this, MainActivity.class);
@@ -174,7 +175,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String name = jsonObject.getString("name");
                         boolean done = jsonObject.getBoolean("done");
-                        long id = Long.parseLong(jsonObject.getString("taskId"), 16);
+                        long id = Long.parseLong(jsonObject.getString("taskId"), 36);
 
                         tasks[i] = new Task(name, done, id);
                     }
@@ -222,7 +223,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 }
 
                 //TODO: promeniti ovo
-                Task task = new Task(mItemName, false, Long.parseLong(mTaskId, 16));
+                Task task = new Task(mItemName, false, Long.parseLong(mTaskId, 36));
                 ShowListActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
                         mTaskAdapter.addTask(task);

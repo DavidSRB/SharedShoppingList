@@ -127,7 +127,7 @@ public class TaskAdapter extends BaseAdapter {
                         try {
                             JSONObject jsonObject = new JSONObject();
                             jsonObject.put("done", task.ismChecked());
-                            boolean tempbool = mhttpHelper.putJSONObjectFromURL(ShowListActivity.TASK_URL + "/" + Long.toHexString(task.getmId()), jsonObject);
+                            boolean tempbool = mhttpHelper.putJSONObjectFromURL(ShowListActivity.TASK_URL + "/" + Long.toString(task.getmId(), 36), jsonObject);
                             int i = 0;
                         } catch (IOException | JSONException e) {
                             e.printStackTrace();

@@ -41,11 +41,18 @@ public class NewListActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent;
         switch (v.getId()) {
             case R.id.new_list_act_title_btn:
+                if (et.getText().toString().isEmpty()) {
+                    Toast.makeText(this, R.string.empty_title_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 tv.setText(et.getText());
-                et.setText("");
                 break;
             case R.id.new_list_act_save_btn:
                 String title = tv.getText().toString();
+                if (title.equals(R.string.naslov)) {
+                    Toast.makeText(this, R.string.list_no_title_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 DbHelper dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
                 if (dbHelper.doesListExist(title)) {
                     Toast.makeText(this, R.string.list_exists_error, Toast.LENGTH_SHORT).show();
