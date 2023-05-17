@@ -153,7 +153,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 startActivity(intent);
                 break;
             case R.id.show_list_act_refresh_btn:
-                refreshBtn.setVisibility(View.INVISIBLE);
+                refreshBtn.setVisibility(View.GONE);
                 addBtn.setEnabled(true);
                 fetchTasks();
 
