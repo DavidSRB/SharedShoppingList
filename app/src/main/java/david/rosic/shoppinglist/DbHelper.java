@@ -50,7 +50,7 @@ public class DbHelper extends SQLiteOpenHelper {
         //Creates table of items
         db.execSQL("CREATE TABLE " + TABLE_ITEMS +
                 " (" +
-                COLUMN_ITEM_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_ITEM_ID + " INTEGER, " +
                 COLUMN_ITEM_NAME + " TEXT, " +
                 COLUMN_LIST_NAME + " TEXT, " +
                 COLUMN_TICKED + " INTEGER" +

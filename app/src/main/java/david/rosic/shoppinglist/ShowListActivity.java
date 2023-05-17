@@ -29,9 +29,10 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
     private ImageView btnHome;
     private boolean shared;
     private boolean userOwned;
-    private static String TASK_URL = MainActivity.BASE_URL + "/tasks";
+    public static String TASK_URL = MainActivity.BASE_URL + "/tasks";
     private HttpHelper httpHelper;
     private Button refreshBtn;
+    private Button addBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,20 +53,21 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         lista = findViewById(R.id.show_list_act_list);
         btnHome = findViewById(R.id.toolbar_home);
-        Button addBtn = findViewById(R.id.show_list_act_add_btn);
+        addBtn = findViewById(R.id.show_list_act_add_btn);
         refreshBtn = findViewById(R.id.show_list_act_refresh_btn);
 
         dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
-        adapter = new TaskAdapter(this, dbHelper);
         httpHelper = new HttpHelper();
+        adapter = new TaskAdapter(this, dbHelper, httpHelper);
 
         if (shared && userOwned) {
-            refreshBtn.setVisibility(View.INVISIBLE);
+            refreshBtn.setVisibility(View.GONE);
             fetchTasks();
         } else if (shared) {
             refreshBtn.setVisibility(View.VISIBLE);
+            addBtn.setEnabled(false);
         } else {
-            refreshBtn.setVisibility(View.INVISIBLE);
+            refreshBtn.setVisibility(View.GONE);
             Task[] tasks = dbHelper.getListItems(title);
             adapter.update(tasks);
         }
@@ -97,10 +99,10 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             String name = jsonObject.getString("name");
                             boolean done = jsonObject.getBoolean("done");
-                            long id = jsonObject.getLong("taskId");
+                            long mojId = Long.parseLong(jsonObject.getString("taskId"),16);
                             tasksMongoId = jsonObject.getString("_id");
 
-                            if (taskId == id) {
+                            if (taskId == mojId) {
                                 break;
                             }
                         }
@@ -131,36 +133,12 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                     return;
                 }
                 Random random = new Random();
-                long randomLongId = random.nextLong();
+                long randomLongId = Math.abs(random.nextInt());
 
                 if (shared) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("name", itemName);
-                                jsonObject.put("list", title);
-                                jsonObject.put("done", false);
-                                jsonObject.put("taskId", randomLongId);
-
-                                boolean returnCode = httpHelper.postJSONObjectFromURL(TASK_URL, jsonObject);
-
-                                if (!returnCode) {
-                                    return;
-                                }
-
-                                Task task = new Task(itemName, false, randomLongId);
-                                runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        adapter.addTask(task);
-                                    }
-                                });
-                            } catch (IOException | JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+                    CreteItemRunnable runnable = new CreteItemRunnable(itemName, title, Long.toHexString(randomLongId), httpHelper, adapter);
+                    Thread thread = new Thread(runnable);
+                    thread.start();
                 }
 
                 boolean successIndicator = dbHelper.createItem(itemName, title, randomLongId);
@@ -176,6 +154,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 break;
             case R.id.show_list_act_refresh_btn:
                 refreshBtn.setVisibility(View.INVISIBLE);
+                addBtn.setEnabled(true);
                 fetchTasks();
 
                 break;
@@ -195,7 +174,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String name = jsonObject.getString("name");
                         boolean done = jsonObject.getBoolean("done");
-                        long id = jsonObject.getLong("taskId");
+                        long id = Long.parseLong(jsonObject.getString("taskId"), 16);
 
                         tasks[i] = new Task(name, done, id);
                     }
@@ -211,5 +190,47 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 }
             }
         }).start();
+    }
+
+    private class CreteItemRunnable implements Runnable{
+        private String mTaskId;
+        private String mItemName;
+        private String mTitle;
+        private HttpHelper mHttpHelper;
+        private TaskAdapter mTaskAdapter;
+
+        CreteItemRunnable(String itemName, String title, String taskId, HttpHelper httpHelper, TaskAdapter taskAdapter) {
+            mTaskId = taskId;
+            mItemName = itemName;
+            mTitle = title;
+            mHttpHelper = httpHelper;
+            mTaskAdapter = taskAdapter;
+        }
+
+        public void run() {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", mItemName);
+                jsonObject.put("list", mTitle);
+                jsonObject.put("done", false);
+                jsonObject.put("taskId", mTaskId);
+
+                boolean returnCode = mHttpHelper.postJSONObjectFromURL(TASK_URL, jsonObject);
+
+                if (!returnCode) {
+                    return;
+                }
+
+                //TODO: promeniti ovo
+                Task task = new Task(mItemName, false, Long.parseLong(mTaskId, 16));
+                ShowListActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        mTaskAdapter.addTask(task);
+                    }
+                });
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -10,6 +10,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TaskAdapter extends BaseAdapter {
@@ -18,12 +23,14 @@ public class TaskAdapter extends BaseAdapter {
     private ArrayList<Task> mTasks;
     private ArrayList<Boolean> mChecked;
     private DbHelper mdbHelper;
+    private HttpHelper mhttpHelper;
 
-    public TaskAdapter(Context context, DbHelper mdbHelper) {
+    public TaskAdapter(Context context, DbHelper mdbHelper, HttpHelper mhttpHelper) {
         mTasks = new ArrayList<Task>();
         mChecked = new ArrayList<Boolean>();
         this.mContext = context;
         this.mdbHelper = mdbHelper;
+        this.mhttpHelper = mhttpHelper;
     }
 
     @Override
@@ -114,6 +121,20 @@ public class TaskAdapter extends BaseAdapter {
                 task.setmChecked(!task.ismChecked());
                 mChecked.set(position, (Boolean) task.ismChecked());
                 mdbHelper.setItemState(task.getmId(), task.ismChecked());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("done", task.ismChecked());
+                            boolean tempbool = mhttpHelper.putJSONObjectFromURL(ShowListActivity.TASK_URL + "/" + Long.toHexString(task.getmId()), jsonObject);
+                            int i = 0;
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
             }
         });
 
