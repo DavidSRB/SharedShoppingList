@@ -40,12 +40,12 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
         Bundle extras = getIntent().getExtras();
 
-        if(extras != null){
+        if (extras != null) {
             title = extras.getString("title");
             shared = extras.getBoolean("shared");
             userOwned = extras.getBoolean("userOwned");
             TextView tv = findViewById(R.id.show_list_act_title_tv);
-            if(!title.isEmpty()){
+            if (!title.isEmpty()) {
                 tv.setText(title);
             }
         }
@@ -59,7 +59,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
         adapter = new TaskAdapter(this, dbHelper);
         httpHelper = new HttpHelper();
 
-        if(shared && userOwned){
+        if (shared && userOwned) {
             refreshBtn.setVisibility(View.INVISIBLE);
             fetchTasks();
         } else if (shared) {
@@ -81,11 +81,10 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        //TODO: update the task deletion for the shared lists
         Task task = (Task) adapter.getItem(position);
         long taskId = task.getmId();
 
-        if(shared) {
+        if (shared) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -101,7 +100,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                             long id = jsonObject.getLong("taskId");
                             tasksMongoId = jsonObject.getString("_id");
 
-                            if(taskId == id){
+                            if (taskId == id) {
                                 break;
                             }
                         }
@@ -114,7 +113,6 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
         }
 
         //Possible check errors. The httpDelete returnCode & dbHelper.deleteItem result are never checked
-        //TODO: check for errors
         dbHelper.deleteItem(task.getmId());
         adapter.removeTask(task);
         adapter.removeCheck(position);
@@ -124,18 +122,18 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.show_list_act_add_btn:
                 EditText et = findViewById(R.id.show_list_act_et);
                 String itemName = et.getText().toString();
-                if(itemName.isEmpty()){
+                if (itemName.isEmpty()) {
                     Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Random random = new Random();
                 long randomLongId = random.nextLong();
 
-                if(shared) {
+                if (shared) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -148,7 +146,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
 
                                 boolean returnCode = httpHelper.postJSONObjectFromURL(TASK_URL, jsonObject);
 
-                                if(!returnCode){
+                                if (!returnCode) {
                                     return;
                                 }
 
@@ -166,8 +164,8 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                 }
 
                 boolean successIndicator = dbHelper.createItem(itemName, title, randomLongId);
-                if(!shared){
-                    Task task = new Task(et.getText().toString(),false, randomLongId);
+                if (!shared) {
+                    Task task = new Task(et.getText().toString(), false, randomLongId);
                     adapter.addTask(task);
                 }
                 break;
@@ -184,7 +182,7 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
-    private void fetchTasks(){
+    private void fetchTasks() {
         new Thread(new Runnable() {
             @Override
             public void run() {

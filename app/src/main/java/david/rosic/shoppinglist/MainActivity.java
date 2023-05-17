@@ -1,4 +1,5 @@
 package david.rosic.shoppinglist;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -21,8 +22,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentLogin = Fragment_Login.newInstance("param1","param2");
-        fragmentRegister = Fragment_Register.newInstance("param1","param2");
+        fragmentLogin = Fragment_Login.newInstance("param1", "param2");
+        fragmentRegister = Fragment_Register.newInstance("param1", "param2");
 
         btnLogin = findViewById(R.id.main_act_btn_login);
         btnRegister = findViewById(R.id.main_act_btn_register);
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()){
+        switch (view.getId()) {
             case R.id.main_act_btn_login:
                 btnLogin.setVisibility(View.INVISIBLE);
                 btnRegister.setVisibility(View.INVISIBLE);
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * This function reverts the layout to default
      */
-    private void setHome(){
+    private void setHome() {
         if (fragmentLogin.isAdded()) {
             getSupportFragmentManager().beginTransaction().remove(fragmentLogin).commit();
         }

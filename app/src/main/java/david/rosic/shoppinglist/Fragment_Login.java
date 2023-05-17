@@ -22,7 +22,7 @@ import java.io.IOException;
  * Use the {@link Fragment_Login#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Fragment_Login extends Fragment{
+public class Fragment_Login extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -68,7 +68,7 @@ public class Fragment_Login extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v =  inflater.inflate(R.layout.fragment__login, container, false);
+        View v = inflater.inflate(R.layout.fragment__login, container, false);
         HttpHelper httpHelper = new HttpHelper();
 
         EditText etUsername = v.findViewById(R.id.frag_login_et_username);
@@ -81,7 +81,7 @@ public class Fragment_Login extends Fragment{
                 String username = etUsername.getText().toString();
                 String password = etPass.getText().toString();
 
-                if(username.isEmpty() || password.isEmpty()){
+                if (username.isEmpty() || password.isEmpty()) {
                     Toast.makeText(getActivity(), R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -92,17 +92,17 @@ public class Fragment_Login extends Fragment{
                             JSONObject requestJSON = new JSONObject();
                             requestJSON.put("username", username);
                             requestJSON.put("password", password);
-                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(LOGIN_URL,requestJSON);
-                            if(resultHTTP) {
-                                Intent intent = new Intent(getActivity(),WelcomeActivity.class);
-                                intent.putExtra("username",username);
-                                intent.putExtra("password",password);
+                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(LOGIN_URL, requestJSON);
+                            if (resultHTTP) {
+                                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                                intent.putExtra("username", username);
+                                intent.putExtra("password", password);
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
                                         startActivity(intent);
                                     }
                                 });
-                            }else{
+                            } else {
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
                                         Toast.makeText(getActivity(), R.string.login_error, Toast.LENGTH_SHORT).show();

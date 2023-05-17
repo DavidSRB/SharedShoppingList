@@ -78,9 +78,9 @@ public class Fragment_Register extends Fragment {
         EditText editTxtPass = v.findViewById(R.id.frag_reg_et_pass);
 
         Button btn = v.findViewById(R.id.frag_reg_btn_reg);
-        btn.setOnClickListener(new View.OnClickListener(){
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 // Get the values from the EditText fields
                 String username = editTxtUsername.getText().toString();
                 String email = editTxtEmail.getText().toString();
@@ -112,18 +112,18 @@ public class Fragment_Register extends Fragment {
                             requestJSON.put("username", username);
                             requestJSON.put("password", password);
                             requestJSON.put("email", email);
-                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(REGISTER_URL,requestJSON);
-                            if(resultHTTP) {
-                                Intent intent = new Intent(getActivity(),WelcomeActivity.class);
-                                intent.putExtra("username",username);
-                                intent.putExtra("email",email);
-                                intent.putExtra("password",password);
+                            boolean resultHTTP = httpHelper.postJSONObjectFromURL(REGISTER_URL, requestJSON);
+                            if (resultHTTP) {
+                                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                                intent.putExtra("username", username);
+                                intent.putExtra("email", email);
+                                intent.putExtra("password", password);
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
                                         startActivity(intent);
                                     }
                                 });
-                            }else{
+                            } else {
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
                                         Toast.makeText(getActivity(), R.string.registration_error, Toast.LENGTH_SHORT).show();

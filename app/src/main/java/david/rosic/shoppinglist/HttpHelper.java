@@ -1,9 +1,11 @@
 package david.rosic.shoppinglist;
 
 import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,8 +25,8 @@ public class HttpHelper {
         /*header fields*/
         urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Accept", "application/json");
-        urlConnection.setReadTimeout(10000 /* milliseconds */ );
-        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
+        urlConnection.setReadTimeout(10000 /* milliseconds */);
+        urlConnection.setConnectTimeout(15000 /* milliseconds */);
         try {
             urlConnection.connect();
         } catch (IOException e) {
@@ -39,7 +41,7 @@ public class HttpHelper {
         br.close();
         String jsonString = sb.toString();
         Log.d("HTTP GET", "JSON data- " + jsonString);
-        int responseCode =  urlConnection.getResponseCode();
+        int responseCode = urlConnection.getResponseCode();
         urlConnection.disconnect();
 
 
@@ -54,8 +56,8 @@ public class HttpHelper {
         /*header fields*/
         urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Accept", "application/json");
-        urlConnection.setReadTimeout(10000 /* milliseconds */ );
-        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
+        urlConnection.setReadTimeout(10000 /* milliseconds */);
+        urlConnection.setConnectTimeout(15000 /* milliseconds */);
         try {
             urlConnection.connect();
         } catch (IOException e) {
@@ -71,7 +73,7 @@ public class HttpHelper {
 
         String jsonString = sb.toString();
         Log.d("HTTP GET", "JSON obj- " + jsonString);
-        int responseCode =  urlConnection.getResponseCode();
+        int responseCode = urlConnection.getResponseCode();
         urlConnection.disconnect();
         return responseCode == SUCCESS ? new JSONObject(jsonString) : null;
     }
@@ -83,7 +85,7 @@ public class HttpHelper {
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-        urlConnection.setRequestProperty("Accept","application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
         /*needed when used POST or PUT methods*/
         urlConnection.setDoOutput(true);
         urlConnection.setDoInput(true);
@@ -97,11 +99,11 @@ public class HttpHelper {
         os.writeBytes(jsonObject.toString());
         os.flush();
         os.close();
-        int responseCode =  urlConnection.getResponseCode();
+        int responseCode = urlConnection.getResponseCode();
         Log.i("STATUS", String.valueOf(urlConnection.getResponseCode()));
-        Log.i("MSG" , urlConnection.getResponseMessage());
+        Log.i("MSG", urlConnection.getResponseMessage());
         urlConnection.disconnect();
-        return (responseCode==SUCCESS);
+        return (responseCode == SUCCESS);
     }
 
     /*HTTP delete*/
@@ -111,7 +113,7 @@ public class HttpHelper {
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("DELETE");
         urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        urlConnection.setRequestProperty("Accept","application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
         try {
             urlConnection.connect();
         } catch (IOException e) {
@@ -120,9 +122,9 @@ public class HttpHelper {
         int responseCode = urlConnection.getResponseCode();
 
         Log.i("STATUS", String.valueOf(responseCode));
-        Log.i("MSG" , urlConnection.getResponseMessage());
+        Log.i("MSG", urlConnection.getResponseMessage());
         urlConnection.disconnect();
-        return (responseCode==SUCCESS);
+        return (responseCode == SUCCESS);
     }
 }
 

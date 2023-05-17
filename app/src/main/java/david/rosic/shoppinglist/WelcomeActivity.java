@@ -137,12 +137,12 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(this, ShowListActivity.class);
         ShoppingList shoppingList = (ShoppingList) adapter.getItem(position);
-        int userOwnedInt = dbHelper.isListOwnedByUser(username,shoppingList.getmNaslov());
+        int userOwnedInt = dbHelper.isListOwnedByUser(username, shoppingList.getmNaslov());
         boolean userOwned = false;
-        if(userOwnedInt == 0){
+        if (userOwnedInt == 0) {
             userOwned = true;
         }
-        intent.putExtra("userOwned",userOwned);
+        intent.putExtra("userOwned", userOwned);
         intent.putExtra("shared", shoppingList.ismShared());
         intent.putExtra("title", shoppingList.getmNaslov());
         startActivity(intent);
@@ -158,12 +158,12 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             returnSuccess = true;
         }
 
-        if(shoppingList.ismShared()){
+        if (shoppingList.ismShared()) {
             new Thread(new Runnable() {
                 public void run() {
                     try {
                         boolean test = httpHelper.httpDelete(LIST_URL + "/" + username + "/" + shoppingList.getmNaslov());
-                        if(test){
+                        if (test) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

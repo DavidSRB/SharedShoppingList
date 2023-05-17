@@ -39,7 +39,7 @@ public class NewListActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         Intent intent;
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.new_list_act_title_btn:
                 tv.setText(et.getText());
                 et.setText("");
@@ -47,7 +47,7 @@ public class NewListActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.new_list_act_save_btn:
                 String title = tv.getText().toString();
                 DbHelper dbHelper = new DbHelper(this, MainActivity.DB_NAME, null, 1);
-                if(dbHelper.doesListExist(title)){
+                if (dbHelper.doesListExist(title)) {
                     Toast.makeText(this, R.string.list_exists_error, Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -55,11 +55,11 @@ public class NewListActivity extends AppCompatActivity implements View.OnClickLi
 
                 RadioButton yes = findViewById(R.id.new_list_act_yes_radio_btn);
                 RadioButton no = findViewById(R.id.new_list_act_no_radio_btn);
-                if (yes.isChecked()){
-                    intent.putExtra("shared",true);
-                }else if (no.isChecked()){
-                    intent.putExtra("shared",false);
-                }else{
+                if (yes.isChecked()) {
+                    intent.putExtra("shared", true);
+                } else if (no.isChecked()) {
+                    intent.putExtra("shared", false);
+                } else {
                     Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                     return;
                 }

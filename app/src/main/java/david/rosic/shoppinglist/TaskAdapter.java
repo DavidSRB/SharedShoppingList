@@ -34,9 +34,9 @@ public class TaskAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         Object returnValue = null;
-        try{
+        try {
             returnValue = mTasks.get(position);
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         return returnValue;
@@ -47,34 +47,34 @@ public class TaskAdapter extends BaseAdapter {
         return position;
     }
 
-    public void addTask(Task task){
+    public void addTask(Task task) {
         mTasks.add(task);
         mChecked.add((Boolean) task.ismChecked());
         notifyDataSetChanged();
     }
 
-    public void removeTask(Task task){
+    public void removeTask(Task task) {
         mTasks.remove(task);
         notifyDataSetChanged();
     }
 
-    public void removeCheck(int position){
+    public void removeCheck(int position) {
         mChecked.remove(position);
         notifyDataSetChanged();
     }
 
-    public void update(Task[] tasks){
+    public void update(Task[] tasks) {
         mTasks.clear();
         mChecked.clear();
-        if(tasks != null){
-            for( Task task : tasks ){
+        if (tasks != null) {
+            for (Task task : tasks) {
                 addTask(task);
             }
         }
         notifyDataSetChanged();
     }
 
-    private class ViewHolder{
+    private class ViewHolder {
         TextView mNameViewItem;
         CheckBox mCheckViewItem;
     }
@@ -82,14 +82,14 @@ public class TaskAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null){
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item,null);
+            convertView = inflater.inflate(R.layout.list_item, null);
             viewHolder = new ViewHolder();
             viewHolder.mNameViewItem = (TextView) convertView.findViewById(R.id.show_list_act_list_item_tv);
             viewHolder.mCheckViewItem = (CheckBox) convertView.findViewById(R.id.show_list_act_list_item_cb);
             convertView.setTag(viewHolder);
-        }else{
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         Task task = (Task) getItem(position);
@@ -97,14 +97,14 @@ public class TaskAdapter extends BaseAdapter {
         try {
             checked = (Boolean) mChecked.get(position);
             task.setmChecked((boolean) checked);
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
 
         viewHolder.mNameViewItem.setText(task.getmName());
-        if(task.ismChecked()){
+        if (task.ismChecked()) {
             viewHolder.mCheckViewItem.setChecked(true);
-        }else{
+        } else {
             viewHolder.mCheckViewItem.setChecked(false);
         }
 
@@ -112,7 +112,7 @@ public class TaskAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 task.setmChecked(!task.ismChecked());
-                mChecked.set(position,(Boolean) task.ismChecked());
+                mChecked.set(position, (Boolean) task.ismChecked());
                 mdbHelper.setItemState(task.getmId(), task.ismChecked());
             }
         });
@@ -120,17 +120,17 @@ public class TaskAdapter extends BaseAdapter {
         viewHolder.mCheckViewItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     viewHolder.mNameViewItem.setPaintFlags(viewHolder.mNameViewItem.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                }else{
+                } else {
                     viewHolder.mNameViewItem.setPaintFlags(viewHolder.mNameViewItem.getPaintFlags() & Paint.ANTI_ALIAS_FLAG);
                 }
             }
         });
 
-        if(task.ismChecked()){
+        if (task.ismChecked()) {
             viewHolder.mNameViewItem.setPaintFlags(viewHolder.mNameViewItem.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        }else{
+        } else {
             viewHolder.mNameViewItem.setPaintFlags(viewHolder.mNameViewItem.getPaintFlags() & Paint.ANTI_ALIAS_FLAG);
         }
 

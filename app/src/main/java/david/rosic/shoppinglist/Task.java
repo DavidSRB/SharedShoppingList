@@ -28,8 +28,12 @@ public class Task {
         this.mChecked = mChecked;
     }
 
-    public long getmId() { return mId; }
+    public long getmId() {
+        return mId;
+    }
 
-    public void setmId(long mId) { this.mId = mId; }
+    public void setmId(long mId) {
+        this.mId = mId;
+    }
 
 }

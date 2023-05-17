@@ -28,9 +28,9 @@ public class ShoppingListAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         Object returnValue = null;
-        try{
+        try {
             returnValue = mShoppingList.get(position);
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         return returnValue;
@@ -41,27 +41,27 @@ public class ShoppingListAdapter extends BaseAdapter {
         return position;
     }
 
-    public void addShoppingList(ShoppingList shoppingList){
+    public void addShoppingList(ShoppingList shoppingList) {
         mShoppingList.add(shoppingList);
         notifyDataSetChanged();
     }
 
-    public void removeShoppingList(ShoppingList shoppingList){
+    public void removeShoppingList(ShoppingList shoppingList) {
         mShoppingList.remove(shoppingList);
         notifyDataSetChanged();
     }
 
-    public void update(ShoppingList[] shoppingLists){
+    public void update(ShoppingList[] shoppingLists) {
         mShoppingList.clear();
-        if(shoppingLists != null){
-            for(ShoppingList shoppingList : shoppingLists){
+        if (shoppingLists != null) {
+            for (ShoppingList shoppingList : shoppingLists) {
                 mShoppingList.add(shoppingList);
             }
         }
         notifyDataSetChanged();
     }
 
-    private class ViewHolder{
+    private class ViewHolder {
         TextView mNameViewItem;
         TextView mSharedViewItem;
     }
@@ -69,21 +69,21 @@ public class ShoppingListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null){
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.welcome_act_list_element,null);
+            convertView = inflater.inflate(R.layout.welcome_act_list_element, null);
             viewHolder = new ViewHolder();
             viewHolder.mNameViewItem = (TextView) convertView.findViewById(R.id.welcome_act_list_element_list_name_tv);
             viewHolder.mSharedViewItem = (TextView) convertView.findViewById(R.id.welcome_act_list_element_list_shared_tv);
             convertView.setTag(viewHolder);
-        }else{
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         ShoppingList shoppingList = (ShoppingList) getItem(position);
         viewHolder.mNameViewItem.setText(shoppingList.getmNaslov());
-        if(shoppingList.ismShared()){
+        if (shoppingList.ismShared()) {
             viewHolder.mSharedViewItem.setText(R.string.true_boolean);
-        }else{
+        } else {
             viewHolder.mSharedViewItem.setText(R.string.false_boolean);
         }
 
