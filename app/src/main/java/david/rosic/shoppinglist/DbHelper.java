@@ -303,6 +303,31 @@ public class DbHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    /**
+     * This function returns a list of all the shopping lists that are shared.
+     *
+     * @return returns all shopping lists that are shared.
+     */
+    public ShoppingList[] getAllSharedLists() {
+        SQLiteDatabase db = getReadableDatabase();
+        String selection = COLUMN_SHARED + " = 1";
+        Cursor cursor = db.query(TABLE_LISTS, null, selection, null, null, null, null);
+
+        if (cursor.getCount() <= 0) {
+            close();
+            return null;
+        }
+
+        ShoppingList[] list = new ShoppingList[cursor.getCount()];
+        int i = 0;
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            list[i++] = createListInstance(cursor);
+        }
+
+        close();
+        return list;
+    }
+
     // ---- Functions associated with Items (ShowList Activity) ---- //
 
     /**
@@ -410,6 +435,30 @@ public class DbHelper extends SQLiteOpenHelper {
 
         close();
         return items;
+    }
+
+    /**
+     * This function updates the tasks of a list specified by listName
+     *
+     * @param listName list whose items will be updated
+     * @param taskList new tasks
+     * @return returns a boolean if the update was successful
+     */
+    public boolean updateListItems(String listName, Task[] taskList) {
+        SQLiteDatabase db = getWritableDatabase();
+        int numRowsAffected = db.delete(TABLE_ITEMS, COLUMN_LIST_NAME + " = ?", new String[]{listName});
+
+        for(Task task : taskList){
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ITEM_NAME, task.getmName());
+            values.put(COLUMN_LIST_NAME, listName);
+            values.put(COLUMN_ITEM_ID, task.getmId());
+            values.put(COLUMN_TICKED, task.ismChecked());
+
+            long row = db.insert(TABLE_ITEMS, null, values);
+        }
+        close();
+        return true;
     }
 
 }

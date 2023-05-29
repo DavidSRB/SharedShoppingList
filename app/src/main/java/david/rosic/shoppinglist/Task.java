@@ -1,5 +1,7 @@
 package david.rosic.shoppinglist;
 
+import androidx.annotation.Nullable;
+
 public class Task {
 
     private String mName;
@@ -10,6 +12,18 @@ public class Task {
         this.mName = mName;
         this.mChecked = mChecked;
         this.mId = mId;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Task task = (Task) obj;
+        return mName.equals(task.getmName()) && mChecked == task.ismChecked() && mId == task.getmId();
     }
 
     public String getmName() {

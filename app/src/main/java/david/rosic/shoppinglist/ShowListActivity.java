@@ -222,7 +222,6 @@ public class ShowListActivity extends AppCompatActivity implements AdapterView.O
                     return;
                 }
 
-                //TODO: promeniti ovo
                 Task task = new Task(mItemName, false, Long.parseLong(mTaskId, 36));
                 ShowListActivity.this.runOnUiThread(new Runnable() {
                     public void run() {

@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnRegister;
     private ImageView btnHome;
     public static final String DB_NAME = "shared_list_app.db";
-    public static String BASE_URL = "http://192.168.0.35:3000";
+    public static String BASE_URL = "http://192.168.0.31:3000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
