@@ -26,9 +26,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_CODE_NEW_LIST = 1;
     private static String LIST_URL = MainActivity.BASE_URL + "/lists";
 
-    private HttpHelper httpHelper;
     private ShoppingListAdapter adapter;
     private DbHelper dbHelper;
+    private HttpHelper httpHelper;
     private static boolean showSharedLists = false;
     private String username = "";
     private Button seeLists;
@@ -38,6 +38,9 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        Intent serviceIntent = new Intent(this, DatabaseUpdateService.class);
+        startService(serviceIntent);
 
         Bundle extras = getIntent().getExtras();
 
