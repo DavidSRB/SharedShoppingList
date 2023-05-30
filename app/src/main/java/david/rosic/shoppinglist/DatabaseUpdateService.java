@@ -2,6 +2,7 @@ package david.rosic.shoppinglist;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -107,6 +108,7 @@ public class DatabaseUpdateService extends Service {
     private void sendNotification() {
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
 
+        //Creating the channel for the notification
         String channelId = "channel_id";
         CharSequence channelName = "My Channel";
         String channelDescription = "My Channel Description";
@@ -119,6 +121,11 @@ public class DatabaseUpdateService extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
+        //onClick for the notification
+        Intent intent = new Intent(this, MainActivity.class);
+        int uniqueId = (int) System.currentTimeMillis();
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, uniqueId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Build the notification
         NotificationCompat.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -130,6 +137,7 @@ public class DatabaseUpdateService extends Service {
                 .setContentTitle("Database Update")
                 .setContentText("New data is available in the database.")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         // Send the notification
